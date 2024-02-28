@@ -71,6 +71,12 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
+    """Books places for a competition and checks
+    if the secretary is trying to book:
+        - More places than available on the competition
+        - More places than she can book
+    """
+
     competition = [
         c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]

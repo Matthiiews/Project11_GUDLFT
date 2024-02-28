@@ -2,8 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Utilisation de url_for pour générer le chemin vers le fichier style.css -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
     <title>Booking for {{competition['name']}} || GUDLFT</title>
 </head>
 <body>
@@ -12,8 +10,7 @@
     <form action="/purchasePlaces" method="post">
         <input type="hidden" name="club" value="{{club['name']}}">
         <input type="hidden" name="competition" value="{{competition['name']}}">
-        <label for="places">How many places?</label><input type="number" 
-        min="1" max="12" step="1" name="places" id=""/>
+        <label for="places">How many places?</label><input type="number" name="places" id=""/>
         <button type="submit">Book</button>
     </form>
 
