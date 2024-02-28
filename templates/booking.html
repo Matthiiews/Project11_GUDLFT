@@ -2,6 +2,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Utilisation de url_for pour générer le chemin vers le fichier style.css -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
     <title>Booking for {{competition['name']}} || GUDLFT</title>
 </head>
 <body>
