@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 
@@ -12,6 +13,20 @@ def loadCompetitions():
     with open('competitions.json') as comps:
         listOfCompetitions = json.load(comps)['competitions']
         return listOfCompetitions
+
+
+def sortCompetitionsDate(comps):
+    past = []
+    present = []
+
+    for comp in comps:
+        compDate = datetime.strptime(comp['date'], '%Y-%m-%d %H:%M:%S')
+        if compDate < datetime.now():
+            past.append(comp)
+        elif compDate >= datetime.now():
+            present.append(comp)
+
+    return past, present
 
 
 def initializeBookedPlaces(comps, clubsList):
@@ -43,6 +58,7 @@ app.secret_key = 'something_special'
 
 competitions = loadCompetitions()
 clubs = loadClubs()
+pastCompetitions, presentCompetitions = sortCompetitionsDate(competitions)
 placesBooked = initializeBookedPlaces(competitions, clubs)
 
 
@@ -60,7 +76,8 @@ def showSummary():
         club = [
             club for club in clubs if club['email'] == request.form['email']][0]
         return render_template(
-            'welcome.html', club=club, competitions=competitions)
+            'welcome.html', club=club, pastCompetitions=pastCompetitions,
+            presentCompetitions=presentCompetitions)
     except IndexError:
         if request.form['email'] == '':
             flash("Please enter your email.", 'error')
@@ -71,15 +88,34 @@ def showSummary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
+    """Renders the chosen and valid competition to book a place if invalid
+    competition error.
+    """
+
+    # if foundClub is empty, it will be None instead of an error:
     foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template(
-            'booking.html', club=foundClub, competition=foundCompetition)
-    else:
-        flash("Something went wrong-please try again")
-        return render_template(
-            'welcome.html', club=club, competitions=competitions)
+
+    try:
+        # Find the competition with the given name
+        foundCompetition = [
+            c for c in competitions if c['name'] == competition][0]
+        # Check if the competition is already over
+        if datetime.strptime(foundCompetition['date'],
+                             '%Y-%m-%d %H:%M:%S') < datetime.now():
+            flash("This competition is over.", 'error')
+            status_code = 400
+
+        else:
+            return render_template(
+                'booking.html', club=foundClub, competition=foundCompetition)
+
+    except IndexError:
+        flash("Something went wrong-please try again", 'error')
+        status_code = 404
+
+    return render_template(
+        'welcome.html', club=foundClub, pastCompetitions=pastCompetitions,
+        presentCompetitions=presentCompetitions), status_code
 
 
 @app.route('/purchasePlaces', methods=['POST'])
@@ -112,7 +148,9 @@ def purchasePlaces():
                 club['points'] = int(club['points']) - (placesRequired)
                 flash('Great-booking complete!')
                 return render_template(
-                    'welcome.html', club=club, competitions=competitions)
+                    'welcome.html', club=club,
+                    pastCompetitions=pastCompetitions,
+                    presentCompetitions=presentCompetitions)
 
             except ValueError as errorMessage:
                 flash(errorMessage, 'error')
