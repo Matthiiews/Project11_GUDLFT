@@ -87,8 +87,8 @@ Se rendre sur l'adresse [http://localhost:8089](http://localhost:8089) et entrer
 
 Les captures d'écran des derniers rapports de tests sont disponibles dans le dossier 'reports'.
 
-- [Rapport pytest](reports/pytest_all_tests_passed.png) (tous les tests réussis)
+- [Rapport pytest](reports/pytest.PNG) (tous les tests réussis)
 
-- [Rapport de couverture](reports/coverage_report.png) (100% de couverture)
+- [Rapport de couverture](reports/coverage_report.PNG) (100% de couverture)
 
-- [Rapport de performances locust](reports/locust_report.png) (6 utilisateurs, 1 par seconde)
+- [Rapport de performances locust](reports/locust.PNG) (8 utilisateurs, 1 par seconde)
